@@ -1,0 +1,21 @@
+:root { font-family: system-ui, sans-serif; color: #1c1e21; background: #f6f7f9; }
+body { margin: 0; }
+main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 1.3rem; margin: 0 0 12px; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid #e3e5e8; font-size: .9rem; }
+tbody tr.row { cursor: pointer; }
+tbody tr.row:hover { background: #eef3fb; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.badge { padding: 1px 8px; border-radius: 10px; font-size: .8rem; background: #e3e5e8; }
+.badge.Closed { background: #d6efd9; } .badge.Released { background: #fff0c2; } .badge.Created { background: #e3e5e8; } .badge.In { background: #cfe3ff; }
+.bar { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+button, select { font: inherit; padding: 4px 10px; }
+.muted { color: #6b7280; }
+@media (prefers-color-scheme: dark) {
+  :root { color: #e6e8eb; background: #15171a; }
+  table { background: #1d2025; } th, td { border-color: #2c3037; }
+  tbody tr.row:hover { background: #262b33; }
+  .badge { background: #2c3037; } .badge.Closed { background: #1f4a2a; } .badge.Released { background: #4a3d12; } .badge.In { background: #1c3a63; }
+}
+@media (max-width: 700px) { .hide-sm { display: none; } }

@@ -1,0 +1,12 @@
+<Window x:Class="WorkOrderDesk.ScrapDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Record scrap" Width="360" Height="220" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+  <StackPanel Margin="12">
+    <TextBlock Text="Quantity scrapped"/>
+    <TextBox x:Name="Qty" Margin="0,4,0,10"/>
+    <TextBlock Text="Reason"/>
+    <ComboBox x:Name="Reason" DisplayMemberPath="Name" SelectedValuePath="ScrapReasonID" Margin="0,4,0,0"/>
+    <Button Content="Save" Width="80" Margin="0,16,0,0" HorizontalAlignment="Right" IsDefault="True" Click="Save_Click"/>
+  </StackPanel>
+</Window>

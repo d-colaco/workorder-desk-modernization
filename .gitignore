@@ -1,0 +1,10 @@
+data/
+.env
+bin/
+obj/
+node_modules/
+*.user
+.vs/
+src/WorkOrders.Api/wwwroot/
+TestResults/
+reports/

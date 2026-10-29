@@ -1,0 +1,32 @@
+erDiagram
+  AGGREGATE_VERSION {
+    int AggregateId PK "WorkOrderID"
+    bigint Version "bumped by the triggers"
+  }
+  OUTBOX {
+    bigint OutboxId PK
+    nvarchar AggregateType
+    int AggregateId
+    bigint Version
+    nvarchar Origin "legacy or new"
+    nvarchar TraceParent
+    nvarchar Payload "whole-order snapshot"
+    datetime2 CreatedAt
+    datetime2 PublishedAt "null while unpublished"
+  }
+  INBOX {
+    nvarchar MessageId PK "command id, e.g. new-42"
+    datetime2 ProcessedAt
+  }
+  CONFLICT_LOG {
+    bigint ConflictId PK
+    int WorkOrderID
+    nvarchar Field
+    nvarchar BaseValue "what the planner saw"
+    nvarchar LegacyValue
+    nvarchar NewValue
+    nvarchar Winner "new or legacy"
+    nvarchar MessageId
+  }
+  AGGREGATE_VERSION ||--o{ OUTBOX : "one row per change"
+  AGGREGATE_VERSION ||--o{ CONFLICT_LOG : "per order"

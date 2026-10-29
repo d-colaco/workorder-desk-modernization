@@ -1,0 +1,12 @@
+flowchart TD
+  A["Read the new side, the legacy rows,<br/>both outboxes and the dead-letter queues"] --> B{"Do an order's two sides differ?"}
+  B -->|no| E["identical"]
+  B -->|yes| C{"A message about it<br/>in a dead-letter queue?"}
+  C -->|yes| D["DeadLettered<br/>fix the cause, then make redrive"]
+  C -->|no| F{"Unpublished outbox row, unconfirmed command,<br/>or legacy version ahead of the new side's?"}
+  F -->|yes| G["InFlight<br/>a change is on its way"]
+  F -->|no| H["Unexplained on this read"]
+  H --> I["Wait 2 s and read everything again"]
+  I --> J{"Still unexplained?"}
+  J -->|no| K["Cleared: named in a warning,<br/>not counted"]
+  J -->|yes| L["Unexplained<br/>must be zero once the system has drained"]

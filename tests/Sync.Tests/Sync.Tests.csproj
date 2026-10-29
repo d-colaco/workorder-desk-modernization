@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.16.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.16.0" />
+    <PackageReference Include="Testcontainers.RabbitMq" Version="4.16.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The simulator's rules have no I/O; compiling the file here tests them without running the driver. -->
+    <Compile Include="..\..\src\Lab.Driver\Simulation.cs" Link="Simulation.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WorkOrders.Api\WorkOrders.Api.csproj" />
+    <ProjectReference Include="..\..\src\Sync.Contracts\Sync.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Sync.Legacy\Sync.Legacy.csproj" />
+    <ProjectReference Include="..\..\src\Sync.RabbitMq\Sync.RabbitMq.csproj" />
+  </ItemGroup>
+
+</Project>

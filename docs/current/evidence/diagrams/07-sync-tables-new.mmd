@@ -1,0 +1,33 @@
+erDiagram
+  WORK_ORDER {
+    guid Id PK
+    int LegacyWorkOrderId "null until the old side assigns it"
+    bigint LegacyVersion "last applied snapshot"
+    int LegacyProductId
+  }
+  WORK_ORDER_OPERATION {
+    guid WorkOrderId FK
+    smallint OperationSequence
+    smallint LocationId
+  }
+  OUTBOX {
+    bigint Id PK
+    string Type "command type"
+    int LegacyWorkOrderId
+    guid NewId
+    int SubjectBusinessEntityId
+    string Payload
+    datetime PublishedAt
+    datetime ConfirmedAt "null while in flight"
+  }
+  PROCESSED_MESSAGE {
+    string MessageId PK
+  }
+  CONFLICT_LOG {
+    bigint Id PK
+    int LegacyWorkOrderId
+    string MessageId
+  }
+  WORK_ORDER ||--o{ WORK_ORDER_OPERATION : has
+  WORK_ORDER ||--o{ OUTBOX : "commands about it"
+  WORK_ORDER ||--o{ CONFLICT_LOG : "per order"

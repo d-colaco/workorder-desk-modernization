@@ -1,0 +1,15 @@
+flowchart LR
+  LR["Legacy relay"] -->|publish| E1(["legacy.events"])
+  E1 --> Q1["newside.workorders"]
+  Q1 --> C1["API consumer"]
+  Q1 -. "handler failed: republish" .-> R1["newside.workorders.retry<br/>TTL 5 s"]
+  R1 -. "TTL expires" .-> Q1
+  Q1 -. "after 4 deliveries" .-> X(["dlx"])
+  X --> D1["newside.workorders.dlq"]
+  NR["New-side relay"] -->|publish| E2(["new.events"])
+  E2 --> Q2["legacy.commands"]
+  Q2 --> C2["Legacy consumer"]
+  Q2 -. "handler failed: republish" .-> R2["legacy.commands.retry<br/>TTL 5 s"]
+  R2 -. "TTL expires" .-> Q2
+  Q2 -. "after 4 deliveries" .-> X
+  X --> D2["legacy.commands.dlq"]

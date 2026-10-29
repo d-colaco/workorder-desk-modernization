@@ -1,0 +1,15 @@
+sequenceDiagram
+  participant UI as React / API
+  participant PGo as PostgreSQL (outbox)
+  participant MQ as RabbitMQ
+  participant LC as Legacy consumer
+  participant SQL as SQL Server
+  participant LR as Legacy relay
+  UI->>PGo: apply optimistically + write command, one transaction
+  PGo->>MQ: relay publishes (confirmed)
+  MQ->>LC: command
+  LC->>SQL: ONE transaction: inbox row, session markers, stored procedure
+  Note over SQL: Microsoft's trigger writes history.<br/>The lab trigger writes an outbox row marked origin=new
+  SQL->>LR: outbox row
+  LR->>MQ: confirmation (the legacy state, with our command id)
+  MQ->>UI: replaces the optimistic state and the command is closed

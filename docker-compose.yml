@@ -1,0 +1,88 @@
+# Legacy side: SQL Server 2022 with AdventureWorks OLTP. Other services are added by later slices.
+name: dclab
+
+x-mssql-image: &mssql-image mcr.microsoft.com/mssql/server:2022-latest
+
+services:
+  mssql:
+    image: *mssql-image
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?copy .env.example to .env}
+      MSSQL_MEMORY_LIMIT_MB: ${MSSQL_MEMORY_LIMIT_MB:-2048}
+    ports:
+      - "${MSSQL_BIND_LOCAL:-127.0.0.1}:32131:1433"
+      - "${MSSQL_BIND_VM:-192.168.122.1}:32131:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+      - ./data:/backup:ro
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' -b"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: lab
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?copy .env.example to .env}
+      POSTGRES_DB: workorders
+    ports:
+      - "127.0.0.1:32132:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab -d workorders"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    environment:
+      RABBITMQ_DEFAULT_USER: lab
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?copy .env.example to .env}
+    ports:
+      - "127.0.0.1:32136:5672"     # AMQP
+      - "127.0.0.1:32133:15672"    # management UI
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+  # Dev-only telemetry backend (collector, Prometheus, Tempo and Grafana in one container, v0.36.0, pinned by digest).
+  # It makes no production claim. OTLP/HTTP is on 32135 (also on the libvirt bridge for the Windows VM); Grafana on 32134.
+  lgtm:
+    image: grafana/otel-lgtm@sha256:57c04cbd8e7022f32bb84c4ac005d79baf8b08e2c5be44facf11f5f1f9944ba2
+    ports:
+      - "${MSSQL_BIND_LOCAL:-127.0.0.1}:32134:3000"
+      - "${MSSQL_BIND_LOCAL:-127.0.0.1}:32135:4318"
+      - "${MSSQL_BIND_VM:-192.168.122.1}:32135:4318"
+    volumes:
+      - lgtm-data:/data
+      - ./observability/dashboards:/dclab-dashboards:ro
+      - ./observability/dclab-dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/dclab.yaml:ro
+
+  # One-shot: restores AdventureWorks if absent, then applies legacy/sql/V*.sql once each.
+  mssql-init:
+    image: *mssql-image
+    depends_on:
+      mssql:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      LAB_APP_PASSWORD: ${LAB_APP_PASSWORD:?copy .env.example to .env}
+    volumes:
+      - ./data:/backup:ro
+      - ./legacy/sql:/sql:ro
+      - ./scripts/mssql-init.sh:/init.sh:ro
+    entrypoint: ["/bin/bash", "/init.sh"]
+    restart: "no"
+
+volumes:
+  mssql-data:
+  pg-data:
+  lgtm-data:

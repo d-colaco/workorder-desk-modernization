@@ -1,0 +1,34 @@
+<Window x:Class="WorkOrderDesk.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Work Order Desk" Width="980" Height="560" WindowStartupLocation="CenterScreen">
+  <DockPanel Margin="8">
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+      <TextBlock Text="Status:" VerticalAlignment="Center"/>
+      <ComboBox x:Name="StatusFilter" Width="110" Margin="6,0,16,0" SelectionChanged="Filter_Changed">
+        <ComboBoxItem Content="All" IsSelected="True"/>
+        <ComboBoxItem Content="Created"/>
+        <ComboBoxItem Content="Released"/>
+        <ComboBoxItem Content="In progress"/>
+        <ComboBoxItem Content="Closed"/>
+      </ComboBox>
+      <Button Content="Refresh" Width="70" Click="Refresh_Click"/>
+      <TextBlock x:Name="ActorText" VerticalAlignment="Center" Margin="24,0,0,0" FontStyle="Italic"/>
+    </StackPanel>
+    <GroupBox DockPanel.Dock="Bottom" Header="New work order" Margin="0,8,0,0">
+      <StackPanel Orientation="Horizontal" Margin="6">
+        <TextBlock Text="Product ID" VerticalAlignment="Center"/>
+        <TextBox x:Name="NewProduct" Width="70" Margin="6,0,12,0"/>
+        <TextBlock Text="Quantity" VerticalAlignment="Center"/>
+        <TextBox x:Name="NewQty" Width="60" Margin="6,0,12,0" Text="10"/>
+        <TextBlock Text="Due (yyyy-mm-dd)" VerticalAlignment="Center"/>
+        <TextBox x:Name="NewDue" Width="90" Margin="6,0,12,0"/>
+        <Button Content="Create" Width="70" Click="Create_Click"/>
+        <Button Content="Release selected" Width="110" Margin="12,0,0,0" Click="Release_Click"/>
+        <Button Content="Open detail" Width="90" Margin="12,0,0,0" Click="Open_Click"/>
+      </StackPanel>
+    </GroupBox>
+    <DataGrid x:Name="Grid" AutoGenerateColumns="True" IsReadOnly="True" SelectionMode="Single"
+              MouseDoubleClick="Open_Click"/>
+  </DockPanel>
+</Window>

@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: DcLabWorkOrders
+    type: file
+    options:
+      path: /dclab-dashboards
+      foldersFromFilesStructure: false

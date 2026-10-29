@@ -1,0 +1,27 @@
+flowchart TB
+  subgraph VM["Windows Server 2012 R2 VM (libvirt)"]
+    WPF["WPF client, .NET Framework 4.8<br/>service workorder-desk-wpf-client"]
+  end
+  subgraph Host["Host (Ubuntu): nothing is deployed, it all runs on one machine"]
+    subgraph Procs["Processes started with make (dotnet)"]
+      API["WorkOrders.Api, :32130<br/>serves the React app<br/>new-side relay and consumer<br/>reconciliation timer"]
+      SYNC["Sync.Legacy<br/>legacy relay and command consumer"]
+      DRV["Lab.Driver<br/>edit, bench, simulate"]
+    end
+    subgraph Compose["Containers (docker compose)"]
+      SQL[("SQL Server 2022<br/>AdventureWorks + sync schema<br/>:32131")]
+      PG[("PostgreSQL 17<br/>:32132")]
+      MQ{{"RabbitMQ 4<br/>AMQP :32136, UI :32133"}}
+      OBS["Grafana LGTM<br/>Grafana :32134, OTLP :32135"]
+    end
+  end
+  WPF -->|"stored procedures"| SQL
+  WPF -.->|"OTLP spans"| OBS
+  DRV -->|"procedures, as the desktop does"| SQL
+  DRV -->|"planner requests"| API
+  API --> PG
+  API -->|"reconciliation reads"| SQL
+  API <-->|"commands, events"| MQ
+  SYNC --> SQL
+  SYNC <-->|"events, commands"| MQ
+  Procs -.->|"OTLP spans and metrics"| OBS

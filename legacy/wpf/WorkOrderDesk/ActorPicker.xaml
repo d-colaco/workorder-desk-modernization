@@ -1,0 +1,10 @@
+<Window x:Class="WorkOrderDesk.ActorPicker"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Who are you?" Width="380" Height="170" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+  <StackPanel Margin="12">
+    <TextBlock Text="Production employee:" Margin="0,0,0,6"/>
+    <ComboBox x:Name="Employees" DisplayMemberPath="Name" SelectedValuePath="BusinessEntityID"/>
+    <Button Content="OK" Width="80" Margin="0,16,0,0" HorizontalAlignment="Right" IsDefault="True" Click="Ok_Click"/>
+  </StackPanel>
+</Window>

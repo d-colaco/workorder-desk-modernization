@@ -1,0 +1,9 @@
+flowchart LR
+  F[Floor] --> W[WPF client] -->|procedures| S[(SQL Server<br/>AdventureWorks<br/>+ outbox, inbox)]
+  PL[Planner] --> R[React] --> A[ASP.NET Core API]
+  A --> PG[(PostgreSQL<br/>work orders<br/>+ outbox, inbox)]
+  S -. triggers write .-> LR[Legacy sync worker<br/>relay + command consumer]
+  LR <-->|legacy.events / legacy.commands<br/>retry + dead-letter queues| MQ{{RabbitMQ}}
+  A <-->|relay + consumer| MQ
+  A -->|reconciliation report| S
+  A --> PG
